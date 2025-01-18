@@ -1,16 +1,18 @@
 package pkg
 
 import (
+	"archive/zip"
 	"crypto/md5"
 	"encoding/hex"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
 	"strings"
 )
 
-// Exists 判断文件或目录是否存在
-func Exists(src string) bool {
+// PathExists 判断文件或目录是否存在
+func PathExists(src string) bool {
 	if _, err := os.Stat(src); os.IsNotExist(err) {
 		return false
 	}
@@ -88,4 +90,60 @@ func FileMD5(fp string) (string, error) {
 		return "", err
 	}
 	return strings.ToUpper(hex.EncodeToString(hash.Sum(nil)[:16])), nil
+}
+
+// ZipCompress 压缩指定文件集
+func ZipCompress(files []string, des string, abs bool) error {
+	dir := filepath.Dir(des)
+	if !PathExists(dir) && os.MkdirAll(dir, os.ModePerm) != nil {
+		return fmt.Errorf("dir not exist")
+	}
+
+	zipFile, err := os.Create(des)
+	if err != nil {
+		return err
+	}
+	defer zipFile.Close()
+
+	zipWriter := zip.NewWriter(zipFile)
+	defer zipWriter.Close()
+
+	for _, f := range files {
+		if err = zipCompress(zipWriter, f, abs); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// 添加文件到zip
+func zipCompress(w *zip.Writer, fp string, abs bool) error {
+	f, err := os.Open(fp)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	info, err := f.Stat()
+	if err != nil {
+		return err
+	}
+
+	header, err := zip.FileInfoHeader(info)
+	if err != nil {
+		return err
+	}
+	if abs {
+		header.Name = fp
+	}
+
+	writer, err := w.CreateHeader(header)
+	if err != nil {
+		return err
+	}
+
+	if _, err = io.Copy(writer, f); err != nil {
+		return err
+	}
+	return nil
 }

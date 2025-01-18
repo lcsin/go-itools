@@ -1,7 +1,6 @@
 package pkg
 
 import (
-	"fmt"
 	"io"
 	"strings"
 	"testing"
@@ -12,7 +11,7 @@ func TestPOST(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(string(bytes))
+	t.Log(string(bytes))
 }
 
 func TestGET(t *testing.T) {
@@ -20,7 +19,7 @@ func TestGET(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(string(bytes))
+	t.Log(string(bytes))
 }
 
 func TestHTTP(t *testing.T) {
@@ -60,7 +59,7 @@ func TestHTTP(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(string(bytes))
+	t.Log(string(bytes))
 }
 
 func TestSign(t *testing.T) {
@@ -70,5 +69,5 @@ func TestSign(t *testing.T) {
 	}
 	key := "apikey"
 	sign := Sign(params, key)
-	fmt.Println(sign)
+	t.Log(sign)
 }
