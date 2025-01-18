@@ -1,6 +1,8 @@
 package pkg
 
 import (
+	"context"
+	"fmt"
 	"log"
 	"time"
 
@@ -32,4 +34,21 @@ func CronTask(spec string, callback func()) {
 	}
 
 	c.Start()
+}
+
+func TaskWithTimeout(timeout time.Duration, fn func() error) error {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	done := make(chan error, 1)
+	go func() {
+		done <- fn()
+	}()
+
+	select {
+	case err := <-done:
+		return err
+	case <-ctx.Done():
+		return fmt.Errorf("任务超时")
+	}
 }
