@@ -36,19 +36,20 @@ func CronTask(spec string, callback func()) {
 	c.Start()
 }
 
-func TaskWithTimeout(timeout time.Duration, fn func() error) error {
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+// TimeoutTask 带过期时间的任务
+func TimeoutTask(ctx context.Context, timeout time.Duration, fn func(ctx context.Context) error) error {
+	timeoutCtx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
 	done := make(chan error, 1)
 	go func() {
-		done <- fn()
+		done <- fn(timeoutCtx)
 	}()
 
 	select {
 	case err := <-done:
 		return err
-	case <-ctx.Done():
+	case <-timeoutCtx.Done():
 		return fmt.Errorf("任务超时")
 	}
 }
