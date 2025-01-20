@@ -47,9 +47,9 @@ func TimeoutTask(ctx context.Context, timeout time.Duration, fn func(ctx context
 	}()
 
 	select {
-	case err := <-done:
-		return err
 	case <-timeoutCtx.Done():
 		return fmt.Errorf("任务超时")
+	case err := <-done:
+		return err
 	}
 }
