@@ -2,21 +2,30 @@ package pkg
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
 )
 
 func TestTimeoutTask(t *testing.T) {
-	job := func(ctx context.Context) error {
+	job := func(timeoutCtx context.Context) error {
+		var counter int
 		for {
-			time.Sleep(time.Second * 3)
-			break
+			select {
+			case <-timeoutCtx.Done(): // 任务超时
+				return fmt.Errorf("任务超时")
+			default: // 轮询执行任务
+				time.Sleep(time.Second)
+				counter++
+				t.Logf("do job counter++: %v", counter)
+			}
+
+			// 任务执行完成
+			if counter > 20 {
+				t.Log("job done!!!")
+				return nil
+			}
 		}
-		for {
-			time.Sleep(time.Second * 5)
-			break
-		}
-		return nil
 	}
 
 	now := time.Now()

@@ -37,7 +37,7 @@ func CronTask(spec string, callback func()) {
 }
 
 // TimeoutTask 带过期时间的任务
-func TimeoutTask(ctx context.Context, timeout time.Duration, fn func(ctx context.Context) error) error {
+func TimeoutTask(ctx context.Context, timeout time.Duration, fn func(timeoutCtx context.Context) error) error {
 	timeoutCtx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
