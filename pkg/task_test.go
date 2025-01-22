@@ -18,12 +18,11 @@ func TestTimeoutTask(t *testing.T) {
 				time.Sleep(time.Second)
 				counter++
 				t.Logf("do job counter++: %v", counter)
-			}
-
-			// 任务执行完成
-			if counter > 20 {
-				t.Log("job done!!!")
-				return nil
+				// 任务执行完成
+				if counter > 20 {
+					t.Log("job done!!!")
+					return nil
+				}
 			}
 		}
 	}
