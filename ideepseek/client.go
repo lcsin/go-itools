@@ -1,8 +1,8 @@
 package ideepseek
 
 const (
-	V3 = "deepseek-chat"
-	R1 = "deepseek-reasoner"
+	ModelChat     = "deepseek-chat"
+	ModelReasoner = "deepseek-reasoner"
 
 	RoleSystem    = "system"
 	RoleUser      = "user"
@@ -28,7 +28,7 @@ func NewClient(url, apikey string) *Client {
 	return &Client{
 		Url:    url,
 		Apikey: apikey,
-		Model:  V3,
+		Model:  ModelChat,
 	}
 }
 
